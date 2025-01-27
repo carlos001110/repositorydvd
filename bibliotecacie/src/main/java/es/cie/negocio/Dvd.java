@@ -32,9 +32,9 @@ public class Dvd {
 	public Dvd() {
 		super();
 	}
-	public Dvd(String titulo, int anio, boolean disponible) {
+	public Dvd(int iddvd, String titulo, int anio, boolean disponible) {
 		super();
-		
+		this.iddvd = iddvd;
 		this.titulo = titulo;
 		this.anio = anio;
 		this.disponible = disponible;

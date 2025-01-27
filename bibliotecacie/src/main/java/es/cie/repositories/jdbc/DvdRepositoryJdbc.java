@@ -32,36 +32,50 @@ public class DvdRepositoryJdbc implements DvdRepository {
 			// el resultado se asigno a un resultado
 			rs = sentencia.executeQuery("select * from dvd");
 			while (rs.next()) {
-				Dvd d = new Dvd(rs.getString("titulo"), rs.getInt("anio"), rs.getBoolean("disponible"));
+				Dvd d = new Dvd(rs.getInt("iddvd"),rs.getString("titulo"), rs.getInt("anio"), rs.getBoolean("disponible"));
 				lista.add(d);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
-		
+		  } finally {
+	            try {
+	                if (rs != null) rs.close();
+	                if (sentencia != null) sentencia.close();
+	                if (conexion != null) conexion.close();
+	            } catch (SQLException e) {
+	                e.printStackTrace();
+	            }
 		}
 		return lista;
 	}
 
 	@Override
 	public void insertar(Dvd dvd) {
-		// TODO Auto-generated method stub
-		
-		Connection conexion=null;
-		Statement sentencia=null;
-		try {
-			
-		Class.forName("com.mysql.jdbc.Driver");
-		conexion=DriverManager.getConnection(DB_URL,USER,PASS);
-		sentencia=conexion.createStatement();
-		String insertarSql=("insert into dvd VALUES ('" + dvd.getTitulo() + "', '" + dvd.getAnio() + "', '" + dvd.getDisponible() + "')");		
-		sentencia.executeUpdate(insertarSql);
-		System.out.println(insertarSql);
-		
-	}catch(ClassNotFoundException  | SQLException e){
-		e.printStackTrace();
+	    Connection conexion = null;
+	    Statement sentencia = null;
+	    try {
+	        Class.forName("com.mysql.cj.jdbc.Driver");
+	        conexion = DriverManager.getConnection(DB_URL, USER, PASS);
+	        sentencia = conexion.createStatement();
+	        
+	        // Sin el replace, asumiendo que no hay comillas simples en el título
+	        String insertarSql = "INSERT INTO dvd (titulo, anio, disponible) VALUES ('" + dvd.getTitulo() + "', " + dvd.getAnio() + ", " + (dvd.getDisponible() ? "true" : "false") + ")";
+	        
+	        // Ejecutar la consulta
+	        sentencia.executeUpdate(insertarSql);
+
+	    } catch (ClassNotFoundException | SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (sentencia != null) sentencia.close();
+	            if (conexion != null) conexion.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
 	}
 
-}
 
 	@Override
 	public void borrar(Dvd dvd) {
@@ -99,12 +113,22 @@ public class DvdRepositoryJdbc implements DvdRepository {
 			//el resultado se asigno a un resultado
 			 rs=sentencia.executeQuery("select * from dvd order by "+ orden);
 			 while(rs.next()) {
-				 Dvd s=new Dvd(rs.getString("titulo"),rs.getInt("anio"),rs.getBoolean("disponible"));	
+				 Dvd s=new Dvd(rs.getInt("iddvd"), rs.getString("titulo"),rs.getInt("anio"),rs.getBoolean("disponible"));	
 				 lista.add(s);
 			 }
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
-		}
+			
+			
+		} finally {
+            try {
+                if (sentencia != null) sentencia.close();
+                if (conexion != null) conexion.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    
 		return lista;
 	
 }

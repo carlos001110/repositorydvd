@@ -14,26 +14,23 @@ import es.cie.negocio.Dvd;
 import es.cie.repositories.DvdRepository;
 import es.cie.repositories.jdbc.DvdRepositoryJdbc;
 
-
 @WebServlet("/DvdServlet")
 public class DvdServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+
 	DvdRepository repo = new DvdRepositoryJdbc();
 	List<Dvd> lista = repo.buscartodos();
 
 	// el metodo que se ejecuta cuando pido el servlet
-   
-
-	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// 
+
 		if (request.getParameter("comando") == null) {
 
 			if (request.getParameter("orden") != null) {
 				lista = repo.buscarTodosOrdenados(request.getParameter("orden"));
 			} else {
-				// datos de los socios
+				// datos de los dvd
 				lista = repo.buscartodos();
 			}
 			request.setAttribute("lista", lista);
@@ -45,32 +42,30 @@ public class DvdServlet extends HttpServlet {
 			if (comando.equals("dvdformulario")) {
 				RequestDispatcher despachador = request.getRequestDispatcher("dvdformulario.html");
 				despachador.forward(request, response);
+				//salvar dvd
 			}else if(comando.equals("salvardvd")) {
-	
 
-				String titulo=request.getParameter("titulo");
-				int anio= Integer.parseInt(request.getParameter("anio"));
-                boolean disponible = Boolean.parseBoolean(request.getParameter("disponible"));
+				String titulo = request.getParameter("titulo");
+				int anio = Integer.parseInt(request.getParameter("anio"));
+				boolean disponible = Boolean.parseBoolean(request.getParameter("disponible"));
 
-				Dvd d=new Dvd(titulo,anio,disponible);
-				DvdRepository repo=new DvdRepositoryJdbc();
+				Dvd d = new Dvd(0, titulo, anio, disponible);
 				repo.insertar(d);
 				lista = repo.buscartodos();
-				//vete al listado de insertar
+				// vuelve al listado de dvds
 				request.setAttribute("lista", lista);
 				RequestDispatcher despachador = request.getRequestDispatcher("listadvdjdbc.jsp");
 				despachador.forward(request, response);
-			}else if(comando.equals("borrarsocio")) {
-				int iddvd=Integer.parseInt(request.getParameter("iddvd"));
+			}else if(comando.equals("borrardvd")) {
+				int iddvd = Integer.parseInt(request.getParameter("iddvd"));
 				System.out.println("funciona");
 
+			
 
-				Dvd d=new Dvd(iddvd);
-				DvdRepository repo=new DvdRepositoryJdbc();
+				Dvd d = new Dvd(iddvd);
 				repo.borrar(d);
 
-				
-				lista=repo.buscartodos();
+				lista = repo.buscartodos();
 				request.setAttribute("lista", lista);
 				RequestDispatcher despachador = request.getRequestDispatcher("listadvdjdbc.jsp");
 				despachador.forward(request, response);
